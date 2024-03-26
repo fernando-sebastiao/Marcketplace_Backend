@@ -1,24 +1,68 @@
-import express, { NextFunction, Request, Response } from "express";
-import "express-async-errors";
-import { AppError } from "./erros/AppError";
-import { authroutes } from "./modules/Manager/authcontroller";
-import { routes } from "./routes";
+import fastify from "fastify";
+// import { Finds } from "./routes/finds/finds";
+// import { Manager, authenticateSchema } from "./routes/manager/manager";
+// import { ManagerUseCase } from "./routes/manager/manager-usecase.ts";
+import { prisma } from "./clients/prisma-client";
+import { seedRecolhas } from "./clients/seedRecolhas";
+import { Finds } from "./old/finds/finds";
+import { authenticateSchema, Manager } from "./routes/manager/manager";
+import { ManagerUseCase } from "./routes/Manager/manager-useCase";
+const app = fastify();
 
-const app = express()
-app.use(express.json());
-app.use(routes)
-app.use(authroutes)
-app.use((err: Error, request: Request, response: Response, next: NextFunction)=> {
-    if(err instanceof AppError){
-        return response.status(err.statusCode).json({
-            status: "error",
-            message: err.message
-        });
-    }
-    return response.status(500).json({
-        status: "error",
-        message: `Erro no servidor interno - ${err.message}`
-    });
-})
+app.register(Finds, {
+  prefix: "/find",
+});
 
-app.listen(1234, ()=> console.log("Servidor rodando na porta 1234"));
+app.register(Manager, {
+  prefix: "/manager",
+});
+
+app.post("/manager/authenticate", async (req, reply) => {
+  const managerUseCase = new ManagerUseCase();
+  const { email, filialId, password } = authenticateSchema.parse(req.body);
+  try {
+    return reply.send(
+      await managerUseCase.authenticate({
+        email,
+        filialId,
+        password,
+      })
+    );
+  } catch (error) {
+    console.error(error);
+    reply.code(404).send(error);
+  }
+});
+
+app.get("/managers", async (req, reply) => {
+  try {
+    return reply.send(
+      await prisma.filial.findMany({
+        select: {
+          name: true,
+          manager: {
+            select: {
+              email: true,
+              password: true,
+            },
+          },
+        },
+      })
+    );
+  } catch (error) {
+    console.error(error);
+    reply.code(404).send(error);
+  }
+});
+
+setInterval(async () => {
+  await seedRecolhas();
+}, Math.floor(Math.random() * 500000));
+app
+  .listen({
+    host: "0.0.0.0",
+    port: process.env.PORT ? Number(process.env.PORT) : 1234,
+  })
+  .then(() => {
+    console.log(`🔥 HTTP server running at http://localhost:1234`);
+  });

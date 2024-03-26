@@ -11,6 +11,7 @@ datasource db {
   // extensions = [postgis]
 }
 
+
 model Manager {
   id        String   @id @default(uuid())
   name      String   @db.VarChar(250)
@@ -86,12 +87,11 @@ model Driver {
 
 model Payment {
   id        String   @id @default(uuid())
-  clientId  String
   agentId   String?
   createdAt DateTime @default(now()) @map("created_at")
   endAt     DateTime @map("end_at") //data que o tal pagamento termina
-  client    Client   @relation(fields: [clientId], references: [id])
   agent     Agents?  @relation(fields: [agentId], references: [id], onDelete: SetNull)
+  Client    Client[]
 
   @@map("pagamentos")
 }
@@ -101,21 +101,23 @@ model Client {
   filialId    String        @map("filial_id")
   name        String        @db.VarChar(250)
   email       String        @unique
+  paymentId   String
   numberBI    String        @unique @map("number_bi") @db.VarChar(13)
   tel         String        @unique @db.VarChar(12)
   sexo        Sexo
+  role        ClientRole    @default(comercial)
   avatar      String?
   address     String //enderço da casa do cliente
   coordenadas Float[]       @default([0, 0]) @db.DoublePrecision()
   status      PaymentStatus @default(npago)
-  nascimento  DateTime
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @updatedAt @map("updated_at")
+  nascimento DateTime
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
   //relações
   recolhas Recolha[]
+  payment  Payment   @relation(fields: [paymentId], references: [id])
   filial   Filial    @relation(fields: [filialId], references: [id], onDelete: Cascade)
-  payments Payment[]
 }
 
 model Agents {
@@ -129,13 +131,13 @@ model Agents {
   password  String    @default("0000") @map("senha")
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
-  filial    Filial    @relation(fields: [filialId], references: [id])
+  filial    Filial    @relation(fields: [filialId], references: [id], onDelete: Cascade)
   payments  Payment[]
 }
 
 model Recolha {
   id         String   @id @default(uuid())
-  clienteId  String   @map("cliente_id") // ñ esquecer de tirar o destino da recolha na lat e lgn do cliente
+  clientId   String   @map("cliente_id") // ñ esquecer de tirar o destino da recolha na lat e lgn do cliente
   driverId   String   @map("motorista_id")
   filialId   String   @map("filial_id")
   status     Status   @default(pendente)
@@ -146,7 +148,7 @@ model Recolha {
   updatedAt  DateTime @updatedAt @map("updated_at")
 
   //relações
-  client Client @relation(fields: [clienteId], references: [id], onDelete: Cascade)
+  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
   driver Driver @relation(fields: [driverId], references: [id], onDelete: Cascade)
   filial Filial @relation(fields: [filialId], references: [id], onDelete: Cascade)
 }
@@ -156,6 +158,11 @@ enum Status {
   andamento //andamento => recolha a ser realizada no exacto momento pelo motorista
   cancelada //cancelada => recolha cancelada por algum motivo
   finalizada //finalizada => recolha finalizada
+}
+
+enum ClientRole {
+  residencial
+  comercial
 }
 
 enum FilialStatus {

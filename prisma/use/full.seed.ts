@@ -1,7 +1,7 @@
-import { fakerPT_BR as faker } from "@faker-js/faker"
+import { fakerPT_BR as faker } from "@faker-js/faker";
+import dayjs from "dayjs";
 import { prisma } from "../../src/clients/prisma-client";
 interface seedFullProps {
-  clients: number;
   drivers: number;
 }
 const filias = [
@@ -31,30 +31,34 @@ const filias = [
     coordenadas: [-8.825587, 13.247704],
   },
 ];
+export enum sexo {
+  masculino = "M",
+  feminino = "F",
+}
+
+
+
 export async function seedFull({
-  clients: clientsLength,
   drivers: driversLength,
 }: seedFullProps) {
-  enum sexo {
-    masculino = "M",
-    feminino = "F",
-  }
-
-
   for (const filial of filias) {
     const sex = faker.helpers.enumValue(sexo);
     const firstName = faker.person.firstName(sex === "M" ? "male" : "female");
     const lastName = faker.person.lastName(sex === "M" ? "male" : "female");
     const CurrentManager = {
-      name: faker.person.fullName({
-        firstName,
-        lastName,
-      }).toLocaleLowerCase(),
-      email: faker.internet.email({
-        firstName,
-        lastName,
-        provider: "mukumbo.dev",
-      }).toLocaleLowerCase(),
+      name: faker.person
+        .fullName({
+          firstName,
+          lastName,
+        })
+        .toLocaleLowerCase(),
+      email: faker.internet
+        .email({
+          firstName,
+          lastName,
+          provider: "mukumbo.dev",
+        })
+        .toLocaleLowerCase(),
       sexo: sex,
     };
 
@@ -69,10 +73,10 @@ export async function seedFull({
           create: Array.from({ length: 4 }).map((a) => {
             const sex = faker.helpers.enumValue(sexo);
             const firstName = faker.person.firstName(
-              sex === "M" ? "male" : "female",
+              sex === "M" ? "male" : "female"
             );
             const lastName = faker.person.lastName(
-              sex === "M" ? "male" : "female",
+              sex === "M" ? "male" : "female"
             );
             const currentAgent = {
               name: faker.person.fullName({
@@ -95,54 +99,14 @@ export async function seedFull({
             };
           }),
         },
-        clients: {
-          create: Array.from({ length: clientsLength }).map((c) => {
-            const sex = faker.helpers.enumValue(sexo);
-            const firstName = faker.person.firstName(
-              sex === "M" ? "male" : "female",
-            );
-            const lastName = faker.person.lastName(
-              sex === "M" ? "male" : "female",
-            );
-            const Currentclient = {
-              name: faker.person.fullName({
-                firstName,
-                lastName,
-              }),
-              email: faker.internet.email({
-                firstName,
-                lastName,
-                provider: "mukumbo.dev",
-              }),
-              sexo: sex,
-            };
-            return {
-              name: Currentclient.name,
-              email: Currentclient.email,
-              sexo: Currentclient.sexo,
-              address: faker.location.streetAddress({
-                useFullAddress: true,
-              }),
-              coordenadas: faker.location.nearbyGPSCoordinate({
-                origin: [filial.coordenadas[0], filial.coordenadas[1]],
-              }),
-              tel: faker.helpers.fromRegExp(/9[1-5][0-9]{7}/),
-              numberBI: faker.helpers.fromRegExp(
-                /[^a-zA-Z]{9}[^a-z0-9]{2}[^a-zA-Z]{2}/,
-              ),
-              nascimento: faker.date.past({ years: 30 }),
-              avatar: faker.image.avatar(),
-            };
-          }),
-        },
         drivers: {
           create: Array.from({ length: driversLength }).map((d) => {
             const sex = faker.helpers.enumValue(sexo);
             const firstName = faker.person.firstName(
-              sex === "M" ? "male" : "female",
+              sex === "M" ? "male" : "female"
             );
             const lastName = faker.person.lastName(
-              sex === "M" ? "male" : "female",
+              sex === "M" ? "male" : "female"
             );
             const currentDriver = {
               name: faker.person.fullName({
@@ -165,14 +129,14 @@ export async function seedFull({
               }),
               tel: faker.helpers.fromRegExp(/9[1-5][0-9]{7}/),
               numberBI: faker.helpers.fromRegExp(
-                /[^a-zA-Z]{9}[^a-z0-9]{2}[^a-zA-Z]{2}/,
+                /[^a-zA-Z]{9}[^a-z0-9]{2}[^a-zA-Z]{2}/
               ),
               nascimento: faker.date.past({ years: 30 }),
               avatar: faker.image.avatar(),
               veiculo: {
                 create: {
                   matricula: faker.helpers
-                    .fromRegExp(/LD-[0-9]{2}-[0-9]{2}-[^0-9]{2}/)
+                    .fromRegExp(/LD[0-9]{2}[0-9]{2}[^0-9]{2}/)
                     .toUpperCase(),
                 },
               },
@@ -191,5 +155,5 @@ export async function seedFull({
       },
     });
   }
-  console.log("Clients and drivers seeded")
+  console.log("Clients and drivers seeded");
 }

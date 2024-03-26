@@ -23,3 +23,15 @@ export class NotAManagerError extends Error{
     }
 }
 
+export class NotASupperManagerrError extends Error{
+    constructor(){
+        super("Usuario não é um Supper manager")
+    }
+}
+
+
+export class NotAAGent extends Error{
+    constructor(){
+        super("Usuario não é agente")
+    }
+}
