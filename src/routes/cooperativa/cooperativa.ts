@@ -5,6 +5,7 @@ import { Client } from "./client/client";
 import { CooperativaUseCase } from "./cooperativa-usecase";
 import { Driver } from "./driver/driver";
 import { Recolha } from "./recolha/recolha";
+import { Filial } from "./filial/filial";
 
 export const authenticateSchema = z.object({
   email: z.string().email({ message: "Formato de email inválido" }),
@@ -40,6 +41,9 @@ export async function Cooperativa(fastify: FastifyInstance) {
   fastify.register(Driver, {
     prefix: "/drivers",
   });
+  fastify.register(Filial, {
+    prefix: "/filial"
+  })
   //   fastify.register(Settings, {
   //     prefix:"/settings"
   //   })

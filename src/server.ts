@@ -6,7 +6,7 @@ import { prisma } from "./clients/prisma-client";
 import { seedRecolhas } from "./clients/seedRecolhas";
 import { Finds } from "./old/finds/finds";
 import { authenticateSchema, Manager } from "./routes/manager/manager";
-import { ManagerUseCase } from "./routes/Manager/manager-useCase";
+import { ManagerUseCase } from "./routes/manager/manager-useCase";
 const app = fastify();
 
 app.register(Finds, {

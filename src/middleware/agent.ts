@@ -1,8 +1,8 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
-import { NotAAGent, UnauthorizedError } from "../erros/AppError";
-import { decrypt } from "../lib/jose";
 import { jwtPayloadSchema } from "../../types";
 import { prisma } from "../clients/prisma-client";
+import { NotAAGent, UnauthorizedError } from "../erros/AppError";
+import { decrypt } from "../lib/jose";
 export async function AuthAgent(req: FastifyRequest, rep: FastifyReply) {
   const token = req.headers.authorization?.replace(/^Bearer /, "");
   if (!token) return rep.code(401).send({ message: "Token missing" });

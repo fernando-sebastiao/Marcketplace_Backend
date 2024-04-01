@@ -7,7 +7,6 @@ const agentSchema = z.object({
   sexo: z.enum(["M", "F"]),
 });
 export type agentProps = z.infer<typeof agentSchema>;
-
 export async function Agent(fastify: FastifyInstance) {
   const agentUseCase = new AgentUseCase();
   fastify.get("/", async (req, reply) => {

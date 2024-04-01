@@ -9,7 +9,9 @@ export interface ClienteDTO{
     coordenadas: number[],
     status:  "Espirado" | "Pago",
     avatar: string,
-    password:string
+    password:string,
+    sexo: "F"|"M",
+    paymentId:string
 }
 export interface authclienteDTO{
     email: string,

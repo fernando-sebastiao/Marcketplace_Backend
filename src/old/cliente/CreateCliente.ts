@@ -1,11 +1,11 @@
-import { Cliente } from "@prisma/client";
+import { Client } from "@prisma/client";
 import { prisma } from "../../clients/prisma-client";
 import { ClienteDTO } from "../../dtos/Cliente-DTO";
 import { AppError } from "../../erros/AppError";
 
 export class CreateCliente{
-    async execute({name, numberBI, address, tel, email, nascimento, filialId, avatar, coordenadas, password, status}:ClienteDTO):Promise<Cliente>{
-       const clienteexists = await prisma.cliente.findUnique({where:{email}});
+    async execute({name, numberBI, address, tel, email, nascimento, filialId, avatar, coordenadas, password, status, sexo, paymentId}:ClienteDTO):Promise<Client>{
+       const clienteexists = await prisma.client.findUnique({where:{email}});
        if(clienteexists){ 
         throw new AppError("Este cliente já existe!");
        }
@@ -15,7 +15,7 @@ export class CreateCliente{
             throw new AppError("Esta filial não existe!");
         }
         //criar o cliente
-        const cliente = await prisma.cliente.create({
+        const cliente = await prisma.client.create({
             data:{
                 name,
                 numberBI,
@@ -26,8 +26,8 @@ export class CreateCliente{
                 filialId,
                 avatar,
                 coordenadas,
-                password,
-                status
+                sexo,
+                paymentId
             }
         });
         return cliente;

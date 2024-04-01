@@ -1,14 +1,14 @@
-import { Cliente } from "@prisma/client";
+import { Client } from "@prisma/client";
 import { prisma } from "../../clients/prisma-client";
 
 export class GetallCliente{
-    async execute(): Promise <Cliente[]>{
-        const cliente = await prisma.cliente.findMany({
+    async execute(): Promise <Client[]>{
+        const cliente = await prisma.client.findMany({
             orderBy: {
                 id: "desc"
             },
             include:{
-                author_filial:{
+                filial:{
                     select:{
                         name:true,
                         email:true,
