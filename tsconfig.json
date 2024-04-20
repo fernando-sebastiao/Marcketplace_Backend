@@ -7,10 +7,5 @@
         "strict": true,
         "lib": ["esnext"],
         "esModuleInterop": true,
-        "types": [
-            "./types/index.d.ts",
-            "node",
-            "@types/node"
-        ]
     }
 }

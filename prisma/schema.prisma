@@ -11,181 +11,52 @@ datasource db {
   // extensions = [postgis]
 }
 
-
-model Manager {
-  id        String   @id @default(uuid())
-  name      String   @db.VarChar(250)
-  email     String   @unique
-  avatar    String?
-  sexo      Sexo
-  tel       String   @unique @map("telefone") @db.VarChar(9)
-  password  String   @default("0000") @map("senha")
-  role      RoleEnum @default(gerente)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  //relações
-  filial Filial[]
-
-  @@map("manager")
+model User {
+  id         String      @id @default(uuid())
+  name       String
+  email      String      @unique
+  password   String
+  store      Store[]
+  userAcess  UserAcess[]
+  created_at DateTime    @default(now())
+  update_at  DateTime    @updatedAt
 }
 
-model Filial {
-  id          String       @id @default(uuid())
-  managerId   String?      @unique @map("manager_id")
-  name        String       @unique @db.VarChar(100)
-  tel         String       @unique @map("telefone") @db.VarChar(12)
-  address     String       @unique // enderço da filial da empresa
-  email       String       @unique
-  status      FilialStatus @default(fechado) //status da filial
-  coordenadas Float[]      @default([0, 0]) @db.DoublePrecision() //explo [ 33.8475, -170.5953 ]lat,lgn
-  createdAt   DateTime     @default(now()) @map("created_at")
-  updatedAt   DateTime     @updatedAt @map("updated_at")
-
-  //relações
-  clients  Client[]
-  drivers  Driver[]
-  recolhas Recolha[]
-  manager  Manager?  @relation(fields: [managerId], references: [id], onDelete: Cascade)
-  agents   Agents[]
-}
-
-model Veiculo {
-  id        String   @id @default(uuid())
-  matricula String   @unique @db.VarChar(11)
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  driver    Driver[]
-
-  @@map("veiculo")
-}
-
-model Driver {
-  id          String       @id @default(uuid())
-  code        String?      @unique
-  filialId    String       @map("filial_id")
-  veiculoId   String?      @unique @map("veiculo_id")
-  numberBI    String       @unique @map("numberBI") @db.VarChar(13)
-  name        String       @db.VarChar(150)
-  email       String       @unique
-  sexo        Sexo
-  status      DriverStatus @default(Off)
-  coordenadas Float[]      @default([0, 0]) @db.DoublePrecision() //explo [ 33.8475, -170.5953 ]lat,lgn
-  password    String       @default("0000") @map("senha")
-  tel         String       @unique @map("telefone") @db.VarChar(12)
-  nascimento  DateTime
-  avatar      String?
-  createdAt   DateTime     @default(now()) @map("created_at")
-  updatedAt   DateTime     @updatedAt @map("updated_at")
-
-  recolhas Recolha[]
-  veiculo  Veiculo?  @relation(fields: [veiculoId], references: [id], onDelete: SetNull)
-  filial   Filial    @relation(fields: [filialId], references: [id], onDelete: Cascade)
-
-  @@map("driver")
-}
-
-model Payment {
-  id        String   @id @default(uuid())
-  agentId   String?
-  createdAt DateTime @default(now()) @map("created_at")
-  endAt     DateTime @map("end_at") //data que o tal pagamento termina
-  agent     Agents?  @relation(fields: [agentId], references: [id], onDelete: SetNull)
-  Client    Client[]
-
-  @@map("pagamentos")
-}
-
-model Client {
-  id          String        @id @default(uuid())
-  filialId    String        @map("filial_id")
-  name        String        @db.VarChar(250)
-  email       String        @unique
-  paymentId   String
-  numberBI    String        @unique @map("number_bi") @db.VarChar(13)
-  tel         String        @unique @db.VarChar(12)
-  sexo        Sexo
-  role        ClientRole    @default(comercial)
-  avatar      String?
-  address     String //enderço da casa do cliente
-  coordenadas Float[]       @default([0, 0]) @db.DoublePrecision()
-  status      PaymentStatus @default(npago)
-  nascimento DateTime
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-
-  //relações
-  recolhas Recolha[]
-  payment  Payment   @relation(fields: [paymentId], references: [id])
-  filial   Filial    @relation(fields: [filialId], references: [id], onDelete: Cascade)
-}
-
-model Agents {
-  id        String    @id @default(uuid())
-  filialId  String
-  avatar    String?
-  name      String    @db.VarChar(250)
-  email     String    @unique
-  sexo      Sexo
-  tel       String?   @unique @map("telefone") @db.VarChar(9)
-  password  String    @default("0000") @map("senha")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  filial    Filial    @relation(fields: [filialId], references: [id], onDelete: Cascade)
-  payments  Payment[]
-}
-
-model Recolha {
+model UserAcess {
   id         String   @id @default(uuid())
-  clientId   String   @map("cliente_id") // ñ esquecer de tirar o destino da recolha na lat e lgn do cliente
-  driverId   String   @map("motorista_id")
-  filialId   String   @map("filial_id")
-  status     Status   @default(pendente)
-  distance   String?
-  duration   String?
-  directions Json?
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
-
-  //relações
-  client Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  driver Driver @relation(fields: [driverId], references: [id], onDelete: Cascade)
-  filial Filial @relation(fields: [filialId], references: [id], onDelete: Cascade)
+  User       User?    @relation(fields: [userId], references: [id])
+  userId     String?
+  Acess      Acess?   @relation(fields: [acessId], references: [id])
+  acessId    String?
+  created_at DateTime @default(now())
+  update_at  DateTime @updatedAt
 }
 
-enum Status {
-  pendente // pendente=> recolha atribuida para um mado motorista
-  andamento //andamento => recolha a ser realizada no exacto momento pelo motorista
-  cancelada //cancelada => recolha cancelada por algum motivo
-  finalizada //finalizada => recolha finalizada
+model Acess {
+  id         String      @id @default(uuid())
+  name       String      @unique
+  userAcess  UserAcess[]
+  created_at DateTime    @default(now())
+  update_at  DateTime    @updatedAt
 }
 
-enum ClientRole {
-  residencial
-  comercial
+model Product {
+  id         String   @id @default(uuid())
+  name       String
+  price      Decimal
+  amount     Int
+  created_at DateTime @default(now())
+  update_at  DateTime @updatedAt
+  Store      Store?   @relation(fields: [storeId], references: [id])
+  storeId    String
 }
 
-enum FilialStatus {
-  aberta // Quando a tal filial esta On 
-  fechado // Quando for de noite => ñ trabalhamos
-}
-
-enum RoleEnum {
-  superGerente // gerentes que teram acesso ao dashboard principal ["divaldo","fernando","edivaldo"]
-  gerente // gerente de uma dada filial
-}
-
-enum PaymentStatus {
-  npago //pagamento espirado
-  pago //pagamento feito
-}
-
-enum DriverStatus {
-  On
-  Off
-}
-
-enum Sexo {
-  M
-  F
+model Store {
+  id         String    @id @default(uuid())
+  name       String
+  Product    Product[]
+  created_at DateTime  @default(now())
+  update_at  DateTime  @updatedAt
+  User       User?     @relation(fields: [userId], references: [id])
+  userId     String?
 }
