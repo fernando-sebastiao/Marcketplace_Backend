@@ -1,10 +1,10 @@
+import cors from "cors";
 import express, { Request, Response } from "express";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import { router } from "./routes"; // Certifique-se de que o caminho está correto
-
 const app = express();
-
+app.use(cors());
 // Configuração do Swagger
 const swaggerOptions = {
   swaggerDefinition: {
