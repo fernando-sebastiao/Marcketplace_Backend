@@ -34,7 +34,6 @@ app.get("/", (req: Request, res: Response) => {
   return res.json({ message: "Hello world" });
 });
 
-const PORT = 3333;
-app.listen(PORT, () => {
-  console.log(`Server Started on PORT ${PORT}`);
+app.listen(process.env.PORT, () => {
+  console.log(`Server Started on PORT ${process.env.PORT}`);
 });

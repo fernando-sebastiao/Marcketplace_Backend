@@ -54,6 +54,7 @@ export const createUser = async (req: Request, res: Response) => {
   });
   return res.status(201).json({ massage: "Created User", user });
 };
+//pegar todos usuários
 export const getallUser = async (req: Request, res: Response) => {
   const user = await prisma.user.findMany({
     select: {

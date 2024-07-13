@@ -30,7 +30,7 @@ importers:
         specifier: ^1.11.10
         version: 1.11.10
       dotenv:
-        specifier: ^16.4.1
+        specifier: ^16.4.5
         version: 16.4.5
       errors:
         specifier: ^0.3.0
